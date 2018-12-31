@@ -1,0 +1,7 @@
+[package]
+name = "ownrs"
+version = "0.1.0"
+authors = ["Josh Leeb-du Toit <josh.leebdutoit@gmail.com>"]
+edition = "2018"
+
+[dependencies]
