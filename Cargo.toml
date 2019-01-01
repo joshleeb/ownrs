@@ -5,3 +5,4 @@ authors = ["Josh Leeb-du Toit <josh.leebdutoit@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+nom = "4.1.1"
