@@ -23,12 +23,12 @@ impl From<&str> for Owner {
     }
 }
 
-fn from_str(input: CompleteStr) -> Result<Owner, ()> {
+fn str_to_owner(input: CompleteStr) -> Result<Owner, ()> {
     Ok(Owner::from(input.to_string().as_ref()))
 }
 
 named!(pub(crate) owner<CompleteStr, Owner>, exact!(
-    map_res!(take_till1!(ws_or_comment), from_str)
+    map_res!(take_till1!(ws_or_comment), str_to_owner)
 ));
 
 #[cfg(test)]
