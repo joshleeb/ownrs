@@ -1,10 +1,10 @@
 use crate::parser::{
     owner::{owner, Owner},
-    ws_or_comment,
+    is_whitespace,
 };
 use nom::{
-    alt_sep, call, char, eof, error_position, exact, named, pair_sep, preceded_sep, sep, tag,
-    take_till1, terminated, tuple, tuple_parser, types::CompleteStr, wrap_sep, ws,
+    alt_sep, call, char, error_position, exact, named, pair_sep, preceded_sep, sep, tag,
+    take_till1, tuple, tuple_parser, types::CompleteStr, wrap_sep, ws,
 };
 use std::path::PathBuf;
 
@@ -23,7 +23,7 @@ named!(pub(crate) directive<CompleteStr, Directive>, ws!(alt!(
         pair!(tag!("set"), tag!("noparent")) => {
             |_| Directive::NoParent
         } |
-        preceded!(tag!("file:"), take_till1!(ws_or_comment)) => {
+        preceded!(tag!("file:"), take_till1!(is_whitespace)) => {
             |path: CompleteStr| Directive::FilePath((*path).into())
         } |
         owner => {

@@ -1,8 +1,5 @@
-use crate::parser::ws_or_comment;
-use nom::{
-    call, eof, error_position, exact, map, named, take_till1, terminated, tuple, tuple_parser,
-    types::CompleteStr,
-};
+use crate::parser::is_whitespace;
+use nom::{call, map, named, take_till1, types::CompleteStr};
 
 #[derive(Debug, PartialEq)]
 pub(crate) enum Owner {
@@ -24,7 +21,7 @@ impl<'a> From<CompleteStr<'a>> for Owner {
 }
 
 named!(pub(crate) owner<CompleteStr, Owner>, map!(
-    take_till1!(ws_or_comment), Owner::from)
+    take_till1!(is_whitespace), Owner::from)
 );
 
 #[cfg(test)]

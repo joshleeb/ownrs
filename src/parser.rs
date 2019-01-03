@@ -11,8 +11,8 @@ mod owner;
 mod per_file;
 mod statement;
 
-fn ws_or_comment(c: char) -> bool {
-    c == ' ' || c == '#' || c == '\t' || c == '\n'
+fn is_whitespace(c: char) -> bool {
+    c == ' ' || c == '\t' || c == '\n'
 }
 
 // TODO: I imagine it is more efficient to use nom to ignore inline comments rather than splitting
