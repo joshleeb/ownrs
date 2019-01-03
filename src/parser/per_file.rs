@@ -7,8 +7,8 @@ use nom::{
 
 #[derive(Debug, PartialEq)]
 pub(crate) struct PerFile {
-    glob: Glob,
-    directive: Directive,
+    pub(crate) glob: Glob,
+    pub(crate) directive: Directive,
 }
 
 fn str_to_glob(s: &str) -> Result<Glob, Error> {
@@ -20,13 +20,13 @@ fn str_to_glob(s: &str) -> Result<Glob, Error> {
     Glob::new(&glob_str)
 }
 
-named!(pub(crate) per_file<CompleteStr, PerFile>, exact!(ws!(do_parse!(
+named!(pub(crate) per_file<CompleteStr, PerFile>, ws!(do_parse!(
     tag!("per-file") >>
     glob: map_res!(take_until1!("="), |ref s: CompleteStr| str_to_glob(s)) >>
     char!('=') >>
     directive: directive >>
     (PerFile{glob, directive})
-))));
+)));
 
 #[cfg(test)]
 mod tests {
@@ -69,15 +69,6 @@ mod tests {
 
         assert_eq!(parsed, create_per_file("*.rs", Directive::StarGlob));
         assert!(rem.is_empty());
-    }
-
-    #[test]
-    fn invalid_directive() {
-        assert!(per_file(CompleteStr("perfile *.rs = owner")).is_err());
-        assert!(per_file(CompleteStr("per-file *.rs owner")).is_err());
-        assert!(per_file(CompleteStr("per-file *.rs = owner invalid")).is_err());
-        assert!(per_file(CompleteStr("per-file owner")).is_err());
-        assert!(per_file(CompleteStr("per-file *.rs = per-file *.rs = owner")).is_err());
     }
 
     #[test]

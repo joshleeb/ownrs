@@ -16,7 +16,7 @@ pub(crate) enum Directive {
     FilePath(PathBuf),
 }
 
-named!(pub(crate) directive<CompleteStr, Directive>, exact!(ws!(alt!(
+named!(pub(crate) directive<CompleteStr, Directive>, ws!(alt!(
         char!('*') => {
             |_| Directive::StarGlob
         } |
@@ -29,7 +29,7 @@ named!(pub(crate) directive<CompleteStr, Directive>, exact!(ws!(alt!(
         owner => {
             |x: Owner| Directive::Owner(x)
         }
-))));
+)));
 
 #[cfg(test)]
 mod tests {
@@ -60,14 +60,6 @@ mod tests {
     }
 
     #[test]
-    fn no_parent_invalid() {
-        assert!(directive(CompleteStr("set no parent")).is_err());
-        assert!(directive(CompleteStr("set no-parent")).is_err());
-        assert!(directive(CompleteStr("Set noparent")).is_err());
-        assert!(directive(CompleteStr("set NoParent")).is_err());
-    }
-
-    #[test]
     fn filepath_absolute() {
         let (rem, parsed) = directive(CompleteStr("file: /absolute/path")).unwrap();
 
@@ -89,12 +81,6 @@ mod tests {
 
         assert_eq!(parsed, Directive::FilePath("/absolute/path".into()));
         assert!(rem.is_empty());
-    }
-
-    #[test]
-    fn filepath_invalid() {
-        assert!(directive(CompleteStr("file: file path")).is_err());
-        assert!(directive(CompleteStr("file filepath")).is_err());
     }
 
     #[test]
