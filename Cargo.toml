@@ -1,9 +1,8 @@
-[package]
-name = "ownrs"
-version = "0.1.0"
-authors = ["Josh Leeb-du Toit <josh.leebdutoit@gmail.com>"]
-edition = "2018"
+[workspace]
+members = [
+    "ownrs",
+    "ownrs-cli",
+]
 
-[dependencies]
-globset = "0.4.2"
-nom = "4.1.1"
+[replace]
+"ownrs:0.1.0" = { path = "ownrs" }
