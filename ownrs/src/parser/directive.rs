@@ -1,6 +1,6 @@
 use crate::parser::{
-    owner::{owner, Owner},
     is_whitespace,
+    owner::{owner, Owner},
 };
 use nom::{
     alt_sep, call, char, error_position, exact, named, pair_sep, preceded_sep, sep, tag,

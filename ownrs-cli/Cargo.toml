@@ -5,3 +5,5 @@ authors = ["Josh Leeb-du Toit <josh.leebdutoit@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+clap = "2.32.0"
+ownrs = "0.1.0"
