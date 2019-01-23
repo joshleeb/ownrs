@@ -1,4 +1,4 @@
-use clap::{ArgMatches, Values};
+use clap::ArgMatches;
 use std::{convert::TryFrom, env, io, path::PathBuf};
 
 #[derive(Debug, PartialEq)]
@@ -12,7 +12,7 @@ impl TryFrom<ArgMatches<'_>> for Args {
 
     fn try_from(matches: ArgMatches) -> Result<Self, Self::Error> {
         let args = Self {
-            paths: get_paths(matches.values_of("paths"))?,
+            paths: get_paths(matches.values_of("paths").unwrap())?,
             root_dir: get_root_dir(matches.value_of("root_dir"))?,
         };
 
@@ -41,12 +41,9 @@ impl TryFrom<ArgMatches<'_>> for Args {
     }
 }
 
-fn get_paths(arg: Option<Values>) -> io::Result<Vec<PathBuf>> {
-    let paths: Vec<PathBuf> = arg.unwrap().map(PathBuf::from).collect();
+fn get_paths<'a, I: Iterator<Item = &'a str>>(arg: I) -> io::Result<Vec<PathBuf>> {
+    let paths: Vec<PathBuf> = arg.map(PathBuf::from).collect();
 
-    // Check that paths have been provided.
-    //
-    // This should be checked by clap when parsing the arguments, but just to be safe.
     if paths.is_empty() {
         return Err(io::Error::new(
             io::ErrorKind::InvalidInput,
@@ -87,7 +84,29 @@ fn get_root_dir(arg: Option<&str>) -> io::Result<PathBuf> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    // use clap::Values;
     use std::fs::{canonicalize, File};
+
+    #[test]
+    fn get_paths_exists() {
+        let dir = env::temp_dir();
+        let arg = vec![dir.to_str().unwrap()];
+
+        assert_eq!(vec![env::temp_dir()], get_paths(arg.into_iter()).unwrap());
+    }
+
+    #[test]
+    fn get_paths_empty() {
+        assert!(get_paths(vec![].into_iter()).is_err())
+    }
+
+    #[test]
+    fn get_paths_not_found() {
+        let file_path = env::temp_dir().join("not-found");
+        let arg = vec![file_path.to_str().unwrap()];
+
+        assert!(get_paths(arg.into_iter()).is_err())
+    }
 
     #[test]
     fn get_root_dir_exists() {
