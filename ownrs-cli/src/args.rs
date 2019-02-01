@@ -1,5 +1,9 @@
 use clap::ArgMatches;
-use std::{convert::TryFrom, env, io, path::PathBuf};
+use std::{
+    convert::TryFrom,
+    env, io,
+    path::{Path, PathBuf},
+};
 
 #[derive(Debug, PartialEq)]
 pub struct Args {
@@ -16,25 +20,19 @@ impl TryFrom<ArgMatches<'_>> for Args {
             root_dir: get_root_dir(matches.value_of("root_dir"))?,
         };
 
-        // Check that all paths are children of the root directory.
-        for path in &args.paths {
-            let mut dir_path = path.clone();
-
-            // Remove the filename if it's a file.
-            if dir_path.is_file() {
-                dir_path = dir_path.parent().unwrap().into();
-            }
-
-            if !dir_path.starts_with(&args.root_dir) {
-                return Err(io::Error::new(
-                    io::ErrorKind::InvalidInput,
-                    format!(
-                        "root path {} doesn't contain path {}",
-                        args.root_dir.display(),
-                        path.display()
-                    ),
-                ));
-            }
+        let unreachable_path = args
+            .paths
+            .iter()
+            .find(|child| !is_path_reachable(child, &args.root_dir));
+        if let Some(path) = unreachable_path {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                format!(
+                    "root path {} doesn't contain {}",
+                    args.root_dir.display(),
+                    path.display()
+                ),
+            ));
         }
 
         Ok(args)
@@ -58,6 +56,7 @@ fn get_paths<'a, I: Iterator<Item = &'a str>>(arg: I) -> io::Result<Vec<PathBuf>
             format!("unknown path {}", unknown_path.display()),
         ));
     }
+
     Ok(paths)
 }
 
@@ -81,10 +80,19 @@ fn get_root_dir(arg: Option<&str>) -> io::Result<PathBuf> {
     Ok(root_dir)
 }
 
+/// Check if a child path is rechable from the parent path. This is synonymous with the child path
+/// being within the parent directory.
+fn is_path_reachable(mut child: &Path, parent: &Path) -> bool {
+    // Remove the filename if it's a file.
+    if child.is_file() {
+        child = child.parent().unwrap();
+    }
+    parent.is_dir() && child.starts_with(parent)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    // use clap::Values;
     use std::fs::{canonicalize, File};
 
     #[test]
