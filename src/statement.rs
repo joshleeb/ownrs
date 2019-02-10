@@ -1,11 +1,8 @@
-use crate::parser::{
+use crate::{
     directive::{directive, Directive},
     per_file::{per_file, PerFile},
 };
-use nom::{
-    alt, call, eof, error_position, exact, named, terminated, tuple, tuple_parser,
-    types::CompleteStr,
-};
+use nom::{alt, exact, named, types::CompleteStr};
 
 #[derive(Debug, PartialEq)]
 pub enum Statement {
@@ -14,12 +11,8 @@ pub enum Statement {
 }
 
 named!(pub(crate) statement<CompleteStr, Statement>, exact!(alt!(
-        per_file => {
-            |x| Statement::PerFile(x)
-        } |
-        directive => {
-            |x| Statement::Directive(x)
-        }
+        per_file => { Statement::PerFile } |
+        directive => { Statement::Directive }
 )));
 
 #[cfg(test)]

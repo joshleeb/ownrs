@@ -1,5 +1,5 @@
-use crate::parser::is_whitespace;
-use nom::{call, map, named, take_till1, types::CompleteStr};
+use crate::is_whitespace;
+use nom::{map, named, take_till1, types::CompleteStr};
 
 #[derive(Debug, PartialEq)]
 pub enum Owner {
@@ -8,15 +8,29 @@ pub enum Owner {
     Text(String),
 }
 
+impl Owner {
+    fn handle<'a>(handle: CompleteStr<'a>) -> Self {
+        Owner::Handle(handle.trim_start_matches("@").to_string())
+    }
+
+    fn email<'a>(email: CompleteStr<'a>) -> Self {
+        Owner::Email(email.to_string())
+    }
+
+    fn text<'a>(text: CompleteStr<'a>) -> Self {
+        Owner::Text(text.to_string())
+    }
+}
+
 impl<'a> From<CompleteStr<'a>> for Owner {
     fn from(input: CompleteStr<'a>) -> Self {
         if input.starts_with("@") {
-            return Owner::Handle(input.trim_start_matches("@").to_string());
+            return Owner::handle(input);
         }
         if input.contains("@") && !input.ends_with("@") {
-            return Owner::Email(input.to_string());
+            return Owner::email(input);
         }
-        Owner::Text(input.to_string())
+        Owner::text(input)
     }
 }
 

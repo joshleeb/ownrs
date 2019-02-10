@@ -1,2 +1,3 @@
-# ownrs
-Owners File Parser in Rust
+# Ownrs
+
+Parser for OWNERS files.

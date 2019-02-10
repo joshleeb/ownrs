@@ -1,11 +1,8 @@
-use crate::parser::{
+use crate::{
     is_whitespace,
     owner::{owner, Owner},
 };
-use nom::{
-    alt_sep, call, char, error_position, named, pair_sep, preceded_sep, sep, tag, take_till1,
-    tuple, tuple_parser, types::CompleteStr, wrap_sep, ws,
-};
+use nom::{char, named, tag, take_till1, types::CompleteStr, ws};
 use std::path::PathBuf;
 
 #[derive(Debug, PartialEq)]
@@ -16,19 +13,17 @@ pub enum Directive {
     FilePath(PathBuf),
 }
 
+impl Directive {
+    fn file_path<'a>(path: CompleteStr<'a>) -> Self {
+        Directive::FilePath((*path).into())
+    }
+}
+
 named!(pub(crate) directive<CompleteStr, Directive>, ws!(alt!(
-        char!('*') => {
-            |_| Directive::StarGlob
-        } |
-        pair!(tag!("set"), tag!("noparent")) => {
-            |_| Directive::NoParent
-        } |
-        preceded!(tag!("file:"), take_till1!(is_whitespace)) => {
-            |path: CompleteStr| Directive::FilePath((*path).into())
-        } |
-        owner => {
-            |x: Owner| Directive::Owner(x)
-        }
+        char!('*') => { |_| Directive::StarGlob } |
+        pair!(tag!("set"), tag!("noparent")) => { |_| Directive::NoParent } |
+        preceded!(tag!("file:"), take_till1!(is_whitespace)) => { Directive::file_path } |
+        owner => { Directive::Owner }
 )));
 
 #[cfg(test)]

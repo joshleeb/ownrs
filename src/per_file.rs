@@ -1,9 +1,6 @@
-use crate::parser::directive::{directive, Directive};
+use crate::directive::{directive, Directive};
 use globset::{Error, Glob};
-use nom::{
-    call, char, do_parse_sep, error_position, map_res, named, sep, tag, take_until1,
-    types::CompleteStr, wrap_sep, ws,
-};
+use nom::{char, map_res, named, tag, take_until1, types::CompleteStr, ws};
 
 #[derive(Debug, PartialEq)]
 pub struct PerFile {
@@ -13,10 +10,12 @@ pub struct PerFile {
 
 fn str_to_glob(s: &str) -> Result<Glob, Error> {
     let mut glob_str = s.trim().to_string();
-    // Required to be compatable with the globs used inO WNERS files.
+
+    // Required to be compatable with the globs used in OWNERS files.
     if !glob_str.starts_with("*") {
         glob_str = format!("*{}", glob_str);
     }
+
     Glob::new(&glob_str)
 }
 

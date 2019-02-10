@@ -1,6 +1,9 @@
-pub use self::{directive::Directive, owner::Owner, per_file::PerFile, statement::Statement};
+pub use directive::Directive;
+pub use owner::Owner;
+pub use per_file::PerFile;
+pub use statement::Statement;
 
-use self::{error::ParseError, statement::statement};
+use error::ParseError;
 use nom::types::CompleteStr;
 
 mod directive;
@@ -9,18 +12,9 @@ mod owner;
 mod per_file;
 mod statement;
 
-fn is_whitespace(c: char) -> bool {
-    c == ' ' || c == '\t' || c == '\n'
-}
-
-// TODO: I imagine it is more efficient to use nom to ignore inline comments rather than splitting
-// the string. We should benchmark this and update the parser if that is the case.
-fn remove_inline_comments(line: &str) -> &str {
-    line.trim().split("#").nth(0).unwrap()
-}
-
-pub fn parse(input: &str) -> Result<Vec<Statement>, ParseError> {
+pub fn parse<T: AsRef<str>>(input: T) -> Result<Vec<Statement>, ParseError> {
     let filtered = input
+        .as_ref()
         .split("\n")
         // Attach line numbers to each line.
         .enumerate()
@@ -31,11 +25,21 @@ pub fn parse(input: &str) -> Result<Vec<Statement>, ParseError> {
 
     let mut parsed = vec![];
     for (line_num, content) in filtered {
-        statement(CompleteStr(content))
+        statement::statement(CompleteStr(content))
             .map(|(_, output)| parsed.push(output))
             .map_err(|e| ParseError::from_nom(line_num, e))?;
     }
     Ok(parsed)
+}
+
+fn is_whitespace(c: char) -> bool {
+    c == ' ' || c == '\t' || c == '\n'
+}
+
+// TODO: I imagine it is more efficient to use nom to ignore inline comments rather than splitting
+// the string. We should benchmark this and update the parser if that is the case.
+fn remove_inline_comments(line: &str) -> &str {
+    line.trim().split("#").nth(0).unwrap()
 }
 
 #[cfg(test)]
