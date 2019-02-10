@@ -2,7 +2,7 @@ use crate::parser::is_whitespace;
 use nom::{call, map, named, take_till1, types::CompleteStr};
 
 #[derive(Debug, PartialEq)]
-pub(crate) enum Owner {
+pub enum Owner {
     Email(String),
     Handle(String),
     Text(String),

@@ -3,13 +3,13 @@ use crate::parser::{
     owner::{owner, Owner},
 };
 use nom::{
-    alt_sep, call, char, error_position, exact, named, pair_sep, preceded_sep, sep, tag,
-    take_till1, tuple, tuple_parser, types::CompleteStr, wrap_sep, ws,
+    alt_sep, call, char, error_position, named, pair_sep, preceded_sep, sep, tag, take_till1,
+    tuple, tuple_parser, types::CompleteStr, wrap_sep, ws,
 };
 use std::path::PathBuf;
 
 #[derive(Debug, PartialEq)]
-pub(crate) enum Directive {
+pub enum Directive {
     NoParent,
     StarGlob,
     Owner(Owner),

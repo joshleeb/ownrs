@@ -1,14 +1,14 @@
 use crate::parser::directive::{directive, Directive};
 use globset::{Error, Glob};
 use nom::{
-    call, char, do_parse_sep, eof, error_position, exact, map_res, named, sep, tag, take_until1,
-    terminated, tuple, tuple_parser, types::CompleteStr, wrap_sep, ws,
+    call, char, do_parse_sep, error_position, map_res, named, sep, tag, take_until1,
+    types::CompleteStr, wrap_sep, ws,
 };
 
 #[derive(Debug, PartialEq)]
-pub(crate) struct PerFile {
-    pub(crate) glob: Glob,
-    pub(crate) directive: Directive,
+pub struct PerFile {
+    pub glob: Glob,
+    pub directive: Directive,
 }
 
 fn str_to_glob(s: &str) -> Result<Glob, Error> {

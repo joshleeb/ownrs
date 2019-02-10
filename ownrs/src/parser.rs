@@ -1,6 +1,4 @@
-pub(crate) use self::{
-    directive::Directive, owner::Owner, per_file::PerFile, statement::Statement,
-};
+pub use self::{directive::Directive, owner::Owner, per_file::PerFile, statement::Statement};
 
 use self::{error::ParseError, statement::statement};
 use nom::types::CompleteStr;
@@ -21,7 +19,7 @@ fn remove_inline_comments(line: &str) -> &str {
     line.trim().split("#").nth(0).unwrap()
 }
 
-pub(crate) fn parse(input: &str) -> Result<Vec<Statement>, ParseError> {
+pub fn parse(input: &str) -> Result<Vec<Statement>, ParseError> {
     let filtered = input
         .split("\n")
         // Attach line numbers to each line.

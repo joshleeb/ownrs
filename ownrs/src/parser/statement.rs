@@ -8,7 +8,7 @@ use nom::{
 };
 
 #[derive(Debug, PartialEq)]
-pub(crate) enum Statement {
+pub enum Statement {
     Directive(Directive),
     PerFile(PerFile),
 }
