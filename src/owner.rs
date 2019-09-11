@@ -1,7 +1,7 @@
 use crate::is_whitespace;
 use nom::{map, named, take_till1, types::CompleteStr};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Owner {
     Email(String),
     Handle(String),
