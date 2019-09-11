@@ -6,8 +6,9 @@ pub use statement::Statement;
 use error::ParseError;
 use nom::types::CompleteStr;
 
+pub mod error;
+
 mod directive;
-mod error;
 mod owner;
 mod per_file;
 mod statement;
