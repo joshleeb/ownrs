@@ -12,5 +12,5 @@ readme = "README.md"
 repository = "https://github.com/joshleeb/ownrs"
 
 [dependencies]
-globset = "0.4.2"
+globset = "0.4.5"
 nom = "4.2.3"
