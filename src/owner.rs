@@ -1,5 +1,5 @@
 use crate::{error::NomResult, is_whitespace};
-use nom::{bytes::complete::take_till1, combinator::map};
+use nom::{bytes::complete::take_till1, combinator::map, error::context};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Owner {
@@ -35,7 +35,7 @@ impl<'a> From<&'a str> for Owner {
 }
 
 pub(crate) fn owner(input: &str) -> NomResult<Owner> {
-    map(take_till1(is_whitespace), Owner::from)(input)
+    context("owner", map(take_till1(is_whitespace), Owner::from))(input)
 }
 
 #[cfg(test)]

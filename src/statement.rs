@@ -3,7 +3,7 @@ use crate::{
     error::NomResult,
     per_file::{per_file, PerFile},
 };
-use nom::{branch::alt, combinator::map};
+use nom::{branch::alt, combinator::map, error::context};
 
 #[derive(Debug, PartialEq)]
 pub enum Statement {
@@ -12,10 +12,13 @@ pub enum Statement {
 }
 
 pub(crate) fn statement(input: &str) -> NomResult<Statement> {
-    alt((
-        map(per_file, Statement::PerFile),
-        map(directive, Statement::Directive),
-    ))(input)
+    context(
+        "statement",
+        alt((
+            map(per_file, Statement::PerFile),
+            map(directive, Statement::Directive),
+        )),
+    )(input)
 }
 
 #[cfg(test)]

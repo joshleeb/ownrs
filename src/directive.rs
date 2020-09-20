@@ -8,6 +8,7 @@ use nom::{
     bytes::complete::{tag, take_till1},
     character::complete::{char, multispace0, multispace1},
     combinator::map,
+    error::context,
     sequence::{pair, preceded, separated_pair},
 };
 use std::path::PathBuf;
@@ -25,12 +26,15 @@ pub(crate) fn directive(input: &str) -> NomResult<Directive> {
     let no_parent = separated_pair(tag("set"), multispace1, tag("noparent"));
     let file_path = preceded(pair(tag("file:"), multispace0), take_till1(is_whitespace));
 
-    alt((
-        map(star_glob, |_| Directive::StarGlob),
-        map(no_parent, |_| Directive::NoParent),
-        map(file_path, |path: &str| Directive::FilePath(path.into())),
-        map(owner, Directive::Owner),
-    ))(input)
+    context(
+        "directive",
+        alt((
+            map(star_glob, |_| Directive::StarGlob),
+            map(no_parent, |_| Directive::NoParent),
+            map(file_path, |path: &str| Directive::FilePath(path.into())),
+            map(owner, Directive::Owner),
+        )),
+    )(input)
 }
 
 #[cfg(test)]

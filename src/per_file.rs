@@ -7,6 +7,7 @@ use nom::{
     bytes::complete::{tag, take_until},
     character::complete::{char, multispace0, multispace1},
     combinator::map_res,
+    error::context,
     sequence::{preceded, terminated, tuple},
 };
 
@@ -17,12 +18,15 @@ pub struct PerFile {
 }
 
 pub(crate) fn per_file(input: &str) -> NomResult<PerFile> {
-    let (rem, parsed) = tuple((
-        terminated(tag("per-file"), multispace1),
-        map_res(take_until("="), str_to_glob),
-        preceded(terminated(char('='), multispace0), multispace0),
-        directive,
-    ))(input)?;
+    let (rem, parsed) = context(
+        "per-file",
+        tuple((
+            terminated(tag("per-file"), multispace1),
+            map_res(take_until("="), str_to_glob),
+            preceded(terminated(char('='), multispace0), multispace0),
+            directive,
+        )),
+    )(input)?;
 
     Ok((
         rem,

@@ -1,7 +1,7 @@
 use std::{error::Error, fmt, io};
 
-pub(crate) type NomError = nom::Err<()>;
-pub(crate) type NomResult<'a, T> = Result<(&'a str, T), NomError>;
+pub(crate) type NomError<'a> = nom::Err<(&'a str, nom::error::ErrorKind)>;
+pub(crate) type NomResult<'a, T> = Result<(&'a str, T), NomError<'a>>;
 
 #[derive(Debug)]
 pub enum ParseError {
