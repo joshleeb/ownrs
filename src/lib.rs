@@ -4,7 +4,6 @@ pub use per_file::PerFile;
 pub use statement::Statement;
 
 use error::ParseError;
-use nom::types::CompleteStr;
 
 pub mod error;
 
@@ -26,7 +25,7 @@ pub fn parse<T: AsRef<str>>(input: T) -> Result<Vec<Statement>, ParseError> {
 
     let mut parsed = vec![];
     for (line_num, content) in filtered {
-        statement::statement(CompleteStr(content))
+        statement::statement(content)
             .map(|(_, output)| parsed.push(output))
             .map_err(|e| ParseError::from_nom(line_num, e))?;
     }

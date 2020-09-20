@@ -1,5 +1,5 @@
-use crate::is_whitespace;
-use nom::{map, named, take_till1, types::CompleteStr};
+use crate::{error::NomResult, is_whitespace};
+use nom::{bytes::complete::take_till1, combinator::map};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Owner {
@@ -9,21 +9,21 @@ pub enum Owner {
 }
 
 impl Owner {
-    fn handle<'a>(handle: CompleteStr<'a>) -> Self {
+    fn handle<'a>(handle: &'a str) -> Self {
         Owner::Handle(handle.trim_start_matches("@").to_string())
     }
 
-    fn email<'a>(email: CompleteStr<'a>) -> Self {
+    fn email<'a>(email: &'a str) -> Self {
         Owner::Email(email.to_string())
     }
 
-    fn text<'a>(text: CompleteStr<'a>) -> Self {
+    fn text<'a>(text: &'a str) -> Self {
         Owner::Text(text.to_string())
     }
 }
 
-impl<'a> From<CompleteStr<'a>> for Owner {
-    fn from(input: CompleteStr<'a>) -> Self {
+impl<'a> From<&'a str> for Owner {
+    fn from(input: &'a str) -> Self {
         if input.starts_with("@") {
             return Owner::handle(input);
         }
@@ -34,9 +34,9 @@ impl<'a> From<CompleteStr<'a>> for Owner {
     }
 }
 
-named!(pub(crate) owner<CompleteStr, Owner>, map!(
-    take_till1!(is_whitespace), Owner::from)
-);
+pub(crate) fn owner(input: &str) -> NomResult<Owner> {
+    map(take_till1(is_whitespace), Owner::from)(input)
+}
 
 #[cfg(test)]
 mod tests {
@@ -44,7 +44,7 @@ mod tests {
 
     #[test]
     fn handle() {
-        let (rem, parsed) = owner(CompleteStr("@handle")).unwrap();
+        let (rem, parsed) = owner("@handle").unwrap();
 
         assert_eq!(parsed, Owner::Handle("handle".into()));
         assert!(rem.is_empty());
@@ -52,7 +52,7 @@ mod tests {
 
     #[test]
     fn email() {
-        let (rem, parsed) = owner(CompleteStr("name@domain")).unwrap();
+        let (rem, parsed) = owner("name@domain").unwrap();
 
         assert_eq!(parsed, Owner::Email("name@domain".into()));
         assert!(rem.is_empty());
@@ -60,7 +60,7 @@ mod tests {
 
     #[test]
     fn text() {
-        let (rem, parsed) = owner(CompleteStr("text")).unwrap();
+        let (rem, parsed) = owner("text").unwrap();
 
         assert_eq!(parsed, Owner::Text("text".into()));
         assert!(rem.is_empty());

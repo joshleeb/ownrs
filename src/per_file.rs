@@ -1,11 +1,36 @@
-use crate::directive::{directive, Directive};
+use crate::{
+    directive::{directive, Directive},
+    error::NomResult,
+};
 use globset::{Error, Glob};
-use nom::{char, map_res, named, tag, take_until1, types::CompleteStr, ws};
+use nom::{
+    bytes::complete::{tag, take_until},
+    character::complete::{char, multispace0, multispace1},
+    combinator::map_res,
+    sequence::{preceded, terminated, tuple},
+};
 
 #[derive(Debug, PartialEq)]
 pub struct PerFile {
     pub glob: Glob,
     pub directive: Directive,
+}
+
+pub(crate) fn per_file(input: &str) -> NomResult<PerFile> {
+    let (rem, parsed) = tuple((
+        terminated(tag("per-file"), multispace1),
+        map_res(take_until("="), str_to_glob),
+        preceded(terminated(char('='), multispace0), multispace0),
+        directive,
+    ))(input)?;
+
+    Ok((
+        rem,
+        PerFile {
+            glob: parsed.1,
+            directive: parsed.3,
+        },
+    ))
 }
 
 fn str_to_glob(s: &str) -> Result<Glob, Error> {
@@ -18,14 +43,6 @@ fn str_to_glob(s: &str) -> Result<Glob, Error> {
 
     Glob::new(&glob_str)
 }
-
-named!(pub(crate) per_file<CompleteStr, PerFile>, ws!(do_parse!(
-    tag!("per-file") >>
-    glob: map_res!(take_until1!("="), |ref s: CompleteStr| str_to_glob(s)) >>
-    char!('=') >>
-    directive: directive >>
-    (PerFile{glob, directive})
-)));
 
 #[cfg(test)]
 mod tests {
@@ -40,7 +57,7 @@ mod tests {
 
     #[test]
     fn glob_star_directive() {
-        let (rem, parsed) = per_file(CompleteStr("per-file *.rs = *")).unwrap();
+        let (rem, parsed) = per_file("per-file *.rs = *").unwrap();
 
         assert_eq!(parsed, create_per_file("*.rs", Directive::StarGlob));
         assert!(rem.is_empty());
@@ -48,7 +65,7 @@ mod tests {
 
     #[test]
     fn compatability_glob() {
-        let (rem, parsed) = per_file(CompleteStr("per-file Cargo.toml = *")).unwrap();
+        let (rem, parsed) = per_file("per-file Cargo.toml = *").unwrap();
 
         assert_eq!(parsed, create_per_file("*Cargo.toml", Directive::StarGlob));
         assert!(rem.is_empty());
@@ -56,7 +73,7 @@ mod tests {
 
     #[test]
     fn glob_ws_extra() {
-        let (rem, parsed) = per_file(CompleteStr("per-file   *.rs   =   *")).unwrap();
+        let (rem, parsed) = per_file("per-file   *.rs   =   *").unwrap();
 
         assert_eq!(parsed, create_per_file("*.rs", Directive::StarGlob));
         assert!(rem.is_empty());
@@ -64,7 +81,7 @@ mod tests {
 
     #[test]
     fn glob_ws_reduced() {
-        let (rem, parsed) = per_file(CompleteStr("per-file*.rs=*")).unwrap();
+        let (rem, parsed) = per_file("per-file *.rs=*").unwrap();
 
         assert_eq!(parsed, create_per_file("*.rs", Directive::StarGlob));
         assert!(rem.is_empty());
@@ -72,6 +89,6 @@ mod tests {
 
     #[test]
     fn invalid_glob() {
-        assert!(per_file(CompleteStr("per-file invalid-{glob = owner")).is_err());
+        assert!(per_file("per-file invalid-{glob = owner").is_err());
     }
 }

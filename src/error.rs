@@ -1,6 +1,7 @@
 use std::{error::Error, fmt, io};
 
-type NomError<'a> = nom::Err<nom::types::CompleteStr<'a>>;
+pub(crate) type NomError = nom::Err<()>;
+pub(crate) type NomResult<'a, T> = Result<(&'a str, T), NomError>;
 
 #[derive(Debug)]
 pub enum ParseError {

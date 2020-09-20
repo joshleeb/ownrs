@@ -1,8 +1,9 @@
 use crate::{
     directive::{directive, Directive},
+    error::NomResult,
     per_file::{per_file, PerFile},
 };
-use nom::{alt, exact, named, types::CompleteStr};
+use nom::{branch::alt, combinator::map};
 
 #[derive(Debug, PartialEq)]
 pub enum Statement {
@@ -10,10 +11,12 @@ pub enum Statement {
     PerFile(PerFile),
 }
 
-named!(pub(crate) statement<CompleteStr, Statement>, exact!(alt!(
-        per_file => { Statement::PerFile } |
-        directive => { Statement::Directive }
-)));
+pub(crate) fn statement(input: &str) -> NomResult<Statement> {
+    alt((
+        map(per_file, Statement::PerFile),
+        map(directive, Statement::Directive),
+    ))(input)
+}
 
 #[cfg(test)]
 mod tests {
@@ -22,7 +25,7 @@ mod tests {
 
     #[test]
     fn directive() {
-        let (rem, parsed) = statement(CompleteStr("*")).unwrap();
+        let (rem, parsed) = statement("*").unwrap();
 
         assert_eq!(parsed, Statement::Directive(Directive::StarGlob));
         assert!(rem.is_empty());
@@ -30,7 +33,7 @@ mod tests {
 
     #[test]
     fn per_file() {
-        let (rem, parsed) = statement(CompleteStr("per-file *.rs = *")).unwrap();
+        let (rem, parsed) = statement("per-file *.rs = *").unwrap();
 
         assert_eq!(
             parsed,
