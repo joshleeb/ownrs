@@ -14,10 +14,7 @@ pub enum Statement {
 pub(crate) fn statement(input: &str) -> NomResult<Statement> {
     context(
         "statement",
-        alt((
-            map(per_file, Statement::PerFile),
-            map(directive, Statement::Directive),
-        )),
+        alt((map(per_file, Statement::PerFile), map(directive, Statement::Directive))),
     )(input)
 }
 

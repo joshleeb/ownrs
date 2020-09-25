@@ -36,8 +36,9 @@ fn is_whitespace(c: char) -> bool {
     c == ' ' || c == '\t' || c == '\n'
 }
 
-// TODO: I imagine it is more efficient to use nom to ignore inline comments rather than splitting
-// the string. We should benchmark this and update the parser if that is the case.
+// TODO: I imagine it is more efficient to use nom to ignore inline comments
+// rather than splitting the string. We should benchmark this and update the
+// parser if that is the case.
 fn remove_inline_comments(line: &str) -> &str {
     line.trim().split("#").nth(0).unwrap()
 }

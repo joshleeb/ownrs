@@ -28,13 +28,7 @@ pub(crate) fn per_file(input: &str) -> NomResult<PerFile> {
         )),
     )(input)?;
 
-    Ok((
-        rem,
-        PerFile {
-            glob: parsed.1,
-            directive: parsed.3,
-        },
-    ))
+    Ok((rem, PerFile { glob: parsed.1, directive: parsed.3 }))
 }
 
 fn str_to_glob(s: &str) -> Result<Glob, Error> {
@@ -53,10 +47,7 @@ mod tests {
     use super::*;
 
     fn create_per_file(glob_str: &str, directive: Directive) -> PerFile {
-        PerFile {
-            glob: Glob::new(glob_str).unwrap(),
-            directive,
-        }
+        PerFile { glob: Glob::new(glob_str).unwrap(), directive }
     }
 
     #[test]

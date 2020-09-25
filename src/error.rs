@@ -38,10 +38,7 @@ impl From<io::Error> for ParseError {
 
 impl ParseError {
     pub(crate) fn from_nom(line_num: usize, err: NomError) -> ParseError {
-        ParseError::Syntax {
-            line_num,
-            message: err.to_string(),
-        }
+        ParseError::Syntax { line_num, message: err.to_string() }
     }
 
     fn as_str(&self) -> &str {
