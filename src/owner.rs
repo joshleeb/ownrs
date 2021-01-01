@@ -10,7 +10,7 @@ pub enum Owner {
 
 impl Owner {
     fn handle<'a>(handle: &'a str) -> Self {
-        Owner::Handle(handle.trim_start_matches("@").to_string())
+        Owner::Handle(handle.trim_start_matches('@').to_string())
     }
 
     fn email<'a>(email: &'a str) -> Self {
@@ -24,10 +24,10 @@ impl Owner {
 
 impl<'a> From<&'a str> for Owner {
     fn from(input: &'a str) -> Self {
-        if input.starts_with("@") {
+        if input.starts_with('@') {
             return Owner::handle(input);
         }
-        if input.contains("@") && !input.ends_with("@") {
+        if input.contains('@') && !input.ends_with('@') {
             return Owner::email(input);
         }
         Owner::text(input)
