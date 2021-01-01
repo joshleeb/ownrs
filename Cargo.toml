@@ -13,5 +13,5 @@ repository = "https://git.sr.ht/~joshleeb/ownrs"
 homepage = "https://git.sr.ht/~joshleeb/ownrs"
 
 [dependencies]
-globset = "0.4.5"
-nom = "6.0.0-alpha1"
+globset = "0.4.6"
+nom = "6.0.1"
