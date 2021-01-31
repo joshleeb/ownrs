@@ -9,8 +9,8 @@ documentation = "https://docs.rs/crate/ownrs"
 keywords = ["parser", "owners"]
 license = "MIT"
 readme = "README.md"
-repository = "https://git.sr.ht/~joshleeb/ownrs"
-homepage = "https://git.sr.ht/~joshleeb/ownrs"
+repository = "https://github.com/joshleeb/ownrs"
+homepage = "https://github.com/joshleeb/ownrs"
 
 [dependencies]
 globset = "0.4.6"
