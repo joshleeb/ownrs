@@ -1,6 +1,6 @@
 [package]
 name = "ownrs"
-version = "0.3.4"
+version = "0.3.5"
 authors = ["Josh Leeb-du Toit <mail@joshleeb.com>"]
 edition = "2018"
 
